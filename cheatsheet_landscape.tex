@@ -27,7 +27,7 @@
 % if using A4 paper. (This probably isn't strictly necessary.)
 % If using another size paper, use default 1cm margins.
 \ifthenelse{\lengthtest { \paperwidth = 11in}}
-    { \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+    { \geometry{top=.25in,left=.25in,right=.25in,bottom=.25in} }
     {\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
         {\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
         {\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
@@ -82,8 +82,6 @@
 \setlength{\columnsep}{2pt}
 
 
-\section{VI, PE, PI}
-\subsection{Value Iteration}
 Optimal policy:
     $$ \pi^*(s) = argmax_{\pi} V^{\pi}(s) = argmax_{a \in A(s)} \sum_{s'} P(s' | s, a) V(s') $$
 Bellman Equation:
@@ -110,32 +108,49 @@ Policy loss is $\norm{V^{\pi_i} - V}$ and is connected to $V_i$:
 \begin{center}
     if $\norm{V_i - V} < \epsilon$ then $\norm{V^{\pi_i} - V} < 2\epsilon\gamma/(1-\gamma)$
 \end{center}
-\includegraphics[width=8cm]{pics/value_iteration.png}
+% \includegraphics[width=8cm]{pics/value_iteration.png}
 
 
-\subsection{Policy Iteration}
     \indent Policy Evaluation: Given a policy $\pi_i$, calculate $V_i = V^{\pi_i}$, the utility of each state if $\pi_i$ were t be executed. Do this by running Value Iteration with (or directly solving in $O(n^3)$ time the set of linear equations defined by): $V_i(s) = R(s) + \gamma \sum_{s'} P(s' | s, \pi_i(s)) V_i(s')$ \\
     \indent Policy Improvement: Calculate a new MEU policy $\pi_{i+1}$, using one-step look-ahead based on $V_i$. \\
     \indent Terminate when policy improvement yields no change in the utilities. \\
-\includegraphics[width=8cm]{pics/policy_iteration.png}
+% \includegraphics[width=8cm]{pics/policy_iteration.png}
+
+
+\includegraphics[width=8cm]{pics/vi_pe_pi_summary.png}
+\includegraphics[width=8cm]{pics/DP-vs-TD_summary0.png}
+\includegraphics[width=8cm]{pics/DP-vs-TD_summary1.png}
+\includegraphics[width=8cm]{pics/td-vs-mc_convergence.png}
+\includegraphics[width=8cm]{pics/ls_prediction_converg.png}
+\includegraphics[width=8cm]{pics/sarsa_converg.png}
+\includegraphics[width=8cm]{pics/ls_control_converg.png}
 
 
 
-\section{TD-Learning}
-Off-Policy (passive) TD-Learning Update:
-    $$ V^{\pi}(s) \leftarrow V^{\pi}(s) + \alpha(R(s) + \gamma V^{\pi}(s') - V^{\pi}(s)) $$
-\includegraphics[width=8cm]{pics/td0_vfa.png}
+\section{PAC}
+w.p. at least $1 - \delta$, on all but $N_\epsilon$ steps, select $a$ for state $s$ that is $\epsilon$-close to $V^*$.
+	$$|Q(s,a) - V^*(s)| < \epsilon$$
+i.e.
+    $$P(N_\epsilon \leq F_\mathrm{poly}(|S|, |A|, \delta, \epsilon, \gamma)) \geq 1 - \delta$$
+where $N_\epsilon$ is the number of episodes not $\epsilon$ close to optimal.
+\section{Comparisons/Overview}
+\textbf{Model Free}: Derive optimal policy without learning the model (transitions and rewards, leads to weaker theoretical results; ideal for large state space; don’t learn a model learn value function or policy directly\\
+\textbf{Model Based}: Learn transition and reward model, use it to get
+optimal policy, leads to stronger theoretical results (e.g. $R_{max}$ satisfies PAC); ideal for small state space; more exploration (more of the model is learned)\\
+\textbf{Monte Carlo}: resets (assume restart from state several times), wasteful (same trajectory traversed many times), does not assume Markov (works better for non-Markov), high variance, zero bias, not sensitive to initial value, wait till end of episode for reward, converges to minimum least square error between values and observed returns \\
+\textbf{TD}: learns at every step, learns from incomplete sequences, works in non-terminating environments, more sensitive to initial value, more efficient, converges to solution of max-likelihood model \\
 
 
+\textbf{Value Iteration}: Active, Model-Based, Neither \\
+\textbf{Policy Iteration}: Active, Model-Based, Neither \\
+\textbf{Policy Evaluation}: Passive, Model-Based, Neither \\
+\textbf{Monte Carlo}: (Pred=Passive, Ctrl=Active), Model-Free, Either \\
+\textbf{TD-Learning}: (Pred=Passive, Ctrl=Active, Model-Free, Either \\
+\textbf{Q-Learning}: Active, Model-Free, Off-Policy \\
+\textbf{SARSA}: Active, Model-Free, On-Policy \\
 
-\section{Monte-Carlo}
-\includegraphics[width=8cm]{pics/mc_vfa.png}
-
-
-
-
-\section{SARSA}
-\includegraphics[width=8cm]{pics/sarsa_vfa.png}
+\textbf{Passive}: Agent executes a fixed policy and evaluates it
+\textbf{Active}: Agents updates policy as it learns \\
 
 
 % You can even have references
